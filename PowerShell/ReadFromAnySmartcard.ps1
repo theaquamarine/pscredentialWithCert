@@ -128,7 +128,9 @@ namespace SmartCardLogon{
     Add-Type -TypeDefinition $SmartCardCode -Language CSharp
     Add-Type -AssemblyName System.Security
 
-    $ValidCerts = [System.Security.Cryptography.X509Certificates.X509Certificate2[]](Get-ChildItem 'Cert:\CurrentUser\My')
+    $ValidCerts = [System.Security.Cryptography.X509Certificates.X509Certificate2[]](Get-ChildItem 'Cert:\CurrentUser\My' |
+        Where-Object {$_.Extensions.EnhancedKeyUsages.Value -eq '1.3.6.1.4.1.311.20.2.2'})
+        # Smart Card Log-on from KB287547 http://officeredir.microsoft.com/r/rlidGPOIDAndCrypt2O14?clid=1033
     $Cert = [System.Security.Cryptography.X509Certificates.X509Certificate2UI]::SelectFromCollection($ValidCerts, 'Choose a certificate', 'Choose a certificate', 0)
 
     $Pin = Read-Host "Enter your PIN: " -AsSecureString
